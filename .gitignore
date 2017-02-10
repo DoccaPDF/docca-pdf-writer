@@ -5,3 +5,4 @@ node_modules/
 *.pdf
 tmp/
 jestModuleCache/
+coverage/
