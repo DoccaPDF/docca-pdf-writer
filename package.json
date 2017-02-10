@@ -1,0 +1,43 @@
+{
+  "name": "docca-pdf-writer",
+  "version": "0.0.1",
+  "description": "PDF Writer",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepublish": "npm run compile",
+    "compile": "babel src --out-dir lib",
+    "test": "jest"
+  },
+  "author": "Jason Galea <jason@docca.io>",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "babel-cli": "^6.8.0",
+    "babel-core": "^6.18.2",
+    "babel-eslint": "^6.0.4",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015-node6": "^0.2.0",
+    "babel-watch": "^2.0.3",
+    "eslint": "^3.11.1",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "jest": "^18.1.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "lodash": "^4.13.1",
+    "uuid": "^3.0.1"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "testEnvironment": "node",
+    "verbose": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/"
+    ],
+    "cacheDirectory": "jestModuleCache"
+  }
+}
