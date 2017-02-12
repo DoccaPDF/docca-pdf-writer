@@ -108,7 +108,7 @@ const writer = {
    * @returns {Promise}  resolves when the write is complete
    */
   write (data) {
-    const buffer = `${data}\n`;
+    const buffer = new Buffer(`${data}\n`, 'binary');
     this.fileOffset += buffer.length;
     return new Promise((resolve, reject) => {
       this.streamOut.write(buffer, () => {
@@ -133,7 +133,7 @@ const writer = {
     this.fileOffset = 0; // keep track of where the next object will be written
 
     // write the file header
-    return this.write(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`)
+    return this.write(new Buffer(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`), 'binary')
     .then(() => {
       // write a default font object
       return this.addFont({
