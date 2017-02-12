@@ -1,6 +1,7 @@
 import uuid from 'uuid';
 
 import _defaults from 'lodash/defaults';
+import _isArray from 'lodash/isArray';
 import _keys from 'lodash/keys';
 import _map from 'lodash/map';
 
@@ -102,7 +103,10 @@ const writer = {
    * this should be modified to accept an array of text objects
    */
   addText (text) {
-    this.content.addText(text);
+    if (!_isArray(text)) {
+      return this.content.addText([text]);
+    }
+    return this.content.addText(text);
   },
 
   /**

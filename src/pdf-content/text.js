@@ -1,4 +1,19 @@
 
+function single (text) {
+  let markup = [
+    `BT\n${text.x} ${text.y} Td`
+  ];
+  markup.push(`(${text.text}) Tj\nET`);
+  return markup.join('\n');
+}
+
+function setToString (set) {
+  return [
+    `/${set[0].font} ${set[0].size} Tf`,
+    set.map(single).join('\n')
+  ].join('\n');
+}
+
 /**
  * format a text object as a string of PDF operations
  * @param   {Object} text       defines location, font, and text
@@ -11,12 +26,28 @@
  * this should be modified to accept an array of text objects
  */
 export function textToString (text) {
-  let markup = [
-    'q\nBT',
-    `${text.x} ${text.y} Td`
-  ];
-  markup.push(`/${text.font} ${text.size} Tf`);
-  markup.push(`(${text.text}) Tj`);
-  markup.push('ET\nQ\n');
-  return markup.join('\n');
+  let sets = [];
+  let lineSet = [];
+  let style = null;
+  text.forEach(line => {
+    const lineStyle = `${line.font} ${line.size}`;
+    if (style) {
+      if (lineStyle !== style) {
+        sets.push(lineSet);
+        lineSet = [line];
+        style = lineStyle;
+        return;
+      }
+    } else {
+      style = lineStyle;
+    }
+    lineSet.push(line);
+  });
+  sets.push(lineSet);
+
+  return [
+    `q`,
+    sets.map(setToString).join('\n'),
+    `Q\n`
+  ].join('\n');
 }
