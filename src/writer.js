@@ -27,6 +27,7 @@ const writer = {
    * @param {Object} [page.MediaBox]
    */
   addPage (page) {
+    const currentPage = this.page;
     this.page = Page({
       Resources: this.defaultResources,
       MediaBox: this.mediaBox,
@@ -35,7 +36,13 @@ const writer = {
       id: ++this.idCounter
     });
     this.pages.addPage(this.page);
-    return this.addContent();
+
+    return this.addContent()
+    .then(() => {
+      if (currentPage) {
+        return this.writeObject(currentPage.id, asPdfObject(currentPage));
+      }
+    });
   },
 
   /**
@@ -71,8 +78,12 @@ const writer = {
    * @param {String} content.data  PDF operations
    */
   addContent (content) {
+    const currentContent = this.content;
     this.content = Content({ ...content, id: ++this.idCounter });
     this.page.addContent(this.content);
+    if (currentContent) {
+      return this.writeObject(currentContent.id, asPdfStream(currentContent));
+    }
     return Promise.resolve();
   },
 

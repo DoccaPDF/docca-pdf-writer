@@ -31,6 +31,10 @@ describe('writer', () => {
     .then(writer =>
       writer.addPage({ MediaBox: [0, 0, 595, 841] })
       .then(() => writer.addText({ x: 10, y: 800, font: 'F1', size: 16, text: 'Hello World!' }))
+      .then(() => writer.addText({ x: 200, y: 800, font: 'F1', size: 12, text: 'Page 1' }))
+      .then(() => writer.addPage({ MediaBox: [0, 0, 595, 841] }))
+      .then(() => writer.addText({ x: 10, y: 800, font: 'F1', size: 16, text: 'Hello Again!' }))
+      .then(() => writer.addText({ x: 200, y: 800, font: 'F1', size: 12, text: 'Page 2' }))
       .then(() => writer.finish())
     )
   );
