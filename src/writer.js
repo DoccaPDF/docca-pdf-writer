@@ -13,7 +13,11 @@ import Resources from './pdf-objects/resources';
 
 import Trailer from './pdf-objects/trailer';
 
-import { asPdfObject, asPdfStream, asPdfDictionary, xref } from './pdf-objects/utils';
+import { xref } from './utils';
+
+import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
+import asPdfObject from './pdf-object-serialize/as-pdf-object';
+import asPdfStream from './pdf-object-serialize/as-pdf-stream';
 
 const writer = {
   idCounter: 0,
@@ -119,7 +123,7 @@ const writer = {
    * @returns {Promise}  resolves when the write is complete
    */
   write (data) {
-    const buffer = `${data}\n`;
+    const buffer = new Buffer(`${data}\n`, 'binary');
     this.fileOffset += buffer.length;
     return new Promise((resolve, reject) => {
       this.streamOut.write(buffer, () => {
@@ -144,7 +148,7 @@ const writer = {
     this.fileOffset = 0; // keep track of where the next object will be written
 
     // write the file header
-    return this.write(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`)
+    return this.write(new Buffer(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`, 'binary'))
     .then(() => {
       // write a default font object
       return this.addFont({

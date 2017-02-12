@@ -34,35 +34,15 @@ export function asPdfDictionaryLines (keys, flatObject) {
 }
 
 /**
- * returns a PDF object as a string
+ * returns an object as a PDF Dictionary string
  * @param   {Object} obj
- * @param   {Number} obj.id
- * @param   {Array}  obj.keys  the PDF keys
- * @param   {Array}  obj[key]  a PDF key
  * @returns {String}
  */
 export function asPdfDictionary (pdfObject) {
-  const keys = pdfObject.keys || Object.keys(pdfObject);
-  const flatObject = pdfObject.flattenKeys ? pdfObject.flattenKeys() : pdfObject;
+  const keys = Object.keys(pdfObject);
   const lines = [
     `<<`,
-    asPdfDictionaryLines(keys, flatObject) + `>>\n`
-  ];
-  return lines.join('\n');
-}
-
-/**
- * returns a PDF object as a string
- * @param   {Object} obj
- * @param   {Number} obj.id
- * @param   {Array}  obj.keys  the PDF keys
- * @param   {Array}  obj[key]  a PDF key
- * @returns {String}
- */
-export function asPdfObject (pdfObject) {
-  const lines = [
-    head(pdfObject),
-    asPdfDictionary(pdfObject) + `endobj\n`
+    asPdfDictionaryLines(keys, pdfObject) + `>>\n`
   ];
   return lines.join('\n');
 }
@@ -74,21 +54,6 @@ export function asPdfObject (pdfObject) {
  */
 export function arrayToString (values) {
   return values && values.length && `[${values.join(' ')}]`;
-}
-
-export function asPdfStream (pdfObject) {
-  const keys = pdfObject.keys;
-  const flatObject = pdfObject.flattenKeys();
-  const lines = [
-    head(pdfObject),
-    `<<`,
-    asPdfDictionaryLines(keys, flatObject) + `>>`,
-    `stream`,
-    pdfObject.data,
-    `endstream`,
-    `endobj\n`
-  ];
-  return lines.join('\n');
 }
 
 export function xref (offsets, trailerStr) {

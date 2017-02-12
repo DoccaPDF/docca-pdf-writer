@@ -2,7 +2,7 @@ import assert from 'assert';
 import _forEach from 'lodash/forEach';
 import _omit from 'lodash/omit';
 
-import { arrayToString, ref } from './utils';
+import { arrayToString, ref } from '../utils';
 
 const pages = {
   Type: 'Pages',

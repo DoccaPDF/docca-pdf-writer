@@ -1,4 +1,4 @@
-import { props2Array, asPdfDictionaryLines, asPdfObject } from '../utils';
+import { props2Array, asPdfDictionaryLines } from '../utils';
 
 describe('Utils', () => {
   describe('props2Array', () => {
@@ -25,31 +25,6 @@ describe('Utils', () => {
       };
       const expected = `/key1 value1\n/key3 value3\n`;
       const actual = asPdfDictionaryLines(keys, props);
-      expect(actual).toEqual(expected);
-    });
-  });
-
-  describe('asPdfObject', () => {
-    it('converts object to string PDF object', () => {
-      const pdfObject = {
-        id: 3,
-        keys: ['key1', 'key3'],
-        flattenKeys () {
-          return {
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3'
-          };
-        }
-      };
-      const expected = `3 0 obj
-<<
-/key1 value1
-/key3 value3
->>
-endobj
-`;
-      const actual = asPdfObject(pdfObject);
       expect(actual).toEqual(expected);
     });
   });
