@@ -1,7 +1,7 @@
 import assert from 'assert';
 import _omit from 'lodash/omit';
 
-import { ref } from './utils';
+import { ref } from '../utils';
 
 const catalog = {
   Type: 'Catalog',

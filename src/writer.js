@@ -13,7 +13,11 @@ import Resources from './pdf-objects/resources';
 
 import Trailer from './pdf-objects/trailer';
 
-import { asPdfObject, asPdfStream, asPdfDictionary, xref } from './pdf-objects/utils';
+import { xref } from './utils';
+
+import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
+import asPdfObject from './pdf-object-serialize/as-pdf-object';
+import asPdfStream from './pdf-object-serialize/as-pdf-stream';
 
 const writer = {
   idCounter: 0,

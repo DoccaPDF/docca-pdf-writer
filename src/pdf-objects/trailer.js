@@ -1,4 +1,4 @@
-import { ref } from './utils';
+import { ref } from '../utils';
 import _omit from 'lodash/omit';
 
 const trailer = {

@@ -3,7 +3,7 @@ import _omit from 'lodash/omit';
 import _mapValues from 'lodash/mapValues';
 import _merge from 'lodash/merge';
 
-import { ref, asPdfDictionary } from './utils';
+import { ref, asPdfDictionary } from '../utils';
 
 const resources = {
   Type: 'Resources',
