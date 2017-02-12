@@ -96,28 +96,28 @@ const xref = `xref
 ${fontOffset} 00000 n
 `;
 
-pdf.write(xref);
+pdf.write(new Buffer(xref, `binary`));
 ```
 
 After the `xref` comes the `trailer` containing a dictionary telling the reader how many `xref` entries there are, the root object’s id, and the document’s id amongst other things.
 
 ```
-pdf.write(`trailer
+pdf.write(new Buffer(`trailer
 <<
   /Size 7
   /Root 1 0 R
   /ID [<abc123>, <abc123>]
 >>
-`);
+`, `binary`));
 ```
 
 Then we finish it off with a pointer to the start of the xref where the reader knows where to find it near the end of the file.
 
 ```
-pdf.write(`startxref
+pdf.write(new Buffer(`startxref
 ${xrefOffset}
 %%EOF
-`);
+`, `binary`));
 ```
 
 The file that is created is valid PDF markup, but is incomplete so won’t open in a PDF viewer. We’ll need to add some more objects such as Pages, Page,   Font, ProcSet, Resource, and Content, but that’s probably enough for today.
