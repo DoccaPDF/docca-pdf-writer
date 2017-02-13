@@ -1,16 +1,19 @@
 import { ref } from '../utils';
 import _omit from 'lodash/omit';
 
+import asPdfDictionary from '../pdf-object-serialize/as-pdf-dictionary';
+
 const trailer = {
   Type: 'Trailer',
 
-  keys: ['Size', 'Root', 'ID'],
+  keys: ['Size', 'Root', 'ID', 'Info'],
 
   flattenKeys () {
     return {
       Size: this.Size,
       Root: this.Root,
-      ID: `[<${this.ID.join('><')}>]`
+      ID: `[<${this.ID.join('><')}>]`,
+      Info: this.Info && asPdfDictionary(this.Info)
     };
   },
 

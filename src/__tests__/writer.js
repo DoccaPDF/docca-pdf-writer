@@ -27,7 +27,18 @@ describe('writer', () => {
   );
 
   it('writes to streamOut', () =>
-    Writer({ streamOut: fs.createWriteStream(`./tmp/writes-to-stream-out.pdf`) })
+    Writer({
+      streamOut: fs.createWriteStream(`./tmp/writes-to-stream-out.pdf`),
+      Title: 'My Title',
+      Author: 'Me',
+      Subject: 'Info Test',
+      Keywords: 'test info',
+      Creator: 'Jason',
+      Producer: 'docca pdf writer',
+      CreationDate: new Date('2017-02-13T23:27:00'),
+      ModDate: new Date('2017-02-13T23:28:00'),
+      Trapped: true
+    })
     .then(writer =>
       writer.addPage({ MediaBox: [0, 0, 595, 841] })
       .then(() => writer.addText({ x: 10, y: 800, font: 'F1', size: 16, text: 'Hello World!' }))

@@ -4,10 +4,12 @@ import _defaults from 'lodash/defaults';
 import _isArray from 'lodash/isArray';
 import _keys from 'lodash/keys';
 import _map from 'lodash/map';
+import _pick from 'lodash/pick';
 
 import Catalog from './pdf-objects/catalog';
 import Content from './pdf-objects/content';
 import Font from './pdf-objects/font';
+import Info from './pdf-objects/info';
 import Page from './pdf-objects/page';
 import Pages from './pdf-objects/pages';
 import Resources from './pdf-objects/resources';
@@ -186,10 +188,12 @@ const writer = {
     .then(() => this.writeObject(this.content.id, asPdfStream(this.content)))
     .then(() => this.writeObject(catalog.id, asPdfObject(catalog)))
     .then(() => {
+      const infoKeys = Info().keys;
       const trailer = Trailer({
         ID: [this.id, this.id],
         Size: Object.keys(this.objectFileOffsets).length + 1,
-        Root: catalog
+        Root: catalog,
+        Info: Info(_pick(this, infoKeys))
       });
       const startx = this.fileOffset;
 
