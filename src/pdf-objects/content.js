@@ -5,7 +5,7 @@ import { textToString } from '../pdf-content/text';
 const content = {
   Type: 'Content',
 
-  keys: [ 'Length' ],
+  keys: [ 'Length', 'Filter', 'Length1' ],
 
   flattenKeys () {
     return {

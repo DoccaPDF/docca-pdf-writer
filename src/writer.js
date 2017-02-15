@@ -16,7 +16,7 @@ import Resources from './pdf-objects/resources';
 
 import Trailer from './pdf-objects/trailer';
 
-import { ref, xref } from './utils';
+import { xref } from './utils';
 
 import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
 import asPdfObject from './pdf-object-serialize/as-pdf-object';
@@ -129,7 +129,7 @@ const writer = {
    * @returns {Promise}  resolves when the write is complete
    */
   write (data) {
-    const buffer = new Buffer(`${data}\n`, 'binary');
+    const buffer = Buffer.isBuffer(data) ? data : new Buffer(`${data}\n`, 'binary');
     this.fileOffset += buffer.length;
     return new Promise((resolve, reject) => {
       this.streamOut.write(buffer, () => {
