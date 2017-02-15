@@ -16,7 +16,7 @@ import Resources from './pdf-objects/resources';
 
 import Trailer from './pdf-objects/trailer';
 
-import { xref } from './utils';
+import { ref, xref } from './utils';
 
 import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
 import asPdfObject from './pdf-object-serialize/as-pdf-object';
@@ -187,13 +187,14 @@ const writer = {
     .then(() => this.writeObject(this.page.id, asPdfObject(this.page)))
     .then(() => this.writeObject(this.content.id, asPdfStream(this.content)))
     .then(() => this.writeObject(catalog.id, asPdfObject(catalog)))
-    .then(() => {
-      const infoKeys = Info().keys;
+    .then(() => Info({ ..._pick(this, Info().keys), id: ++this.idCounter }))
+    .then(info => this.writeObject(info.id, asPdfObject(info)).then(() => info))
+    .then(info => {
       const trailer = Trailer({
         ID: [this.id, this.id],
         Size: Object.keys(this.objectFileOffsets).length + 1,
         Root: catalog,
-        Info: Info(_pick(this, infoKeys))
+        Info: info
       });
       const startx = this.fileOffset;
 
