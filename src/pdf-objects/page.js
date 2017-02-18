@@ -22,7 +22,7 @@ const page = {
       Parent: this.Parent,
       Contents: arrayToString(this.Contents),
       Annots: arrayToString(this.Annots),
-      Resources: this.Resources,
+      Resources: ref(this.Resources),
       MediaBox: arrayToString(this.MediaBox)
     };
   },
@@ -44,8 +44,24 @@ const page = {
 
   setResources (obj) {
     if (obj) {
-      this.Resources = ref(obj);
+      this.Resources = obj;
     }
+  },
+
+  /**
+   * add resources to the resources object
+   * @param {Object} resources
+   * @param {Object} resources.Font           fonts keyed by handle
+   * @param {Object} resources.Font.<handle>  object with id: fontId
+   * @example
+   * page.addResources({
+   *   Font: {
+   *     F1: { id: 42 }
+   *   }
+   * })
+   */
+  addResources (resources) {
+    this.Resources.addResources(resources);
   },
 
   setMediaBox (obj) {
