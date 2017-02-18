@@ -52,6 +52,17 @@ describe('writer', () => {
         { x: 10, y: 700, font: 'F1', size: 16, text: 'More Hello' },
         { x: 200, y: 700, font: 'F1', size: 16, text: 'Page 2' }
       ]))
+      .then(() => {
+        return new Promise((resolve, reject) => {
+          fs.readFile('./test/fixtures/docca-logo-alpha.png', (err, buffer) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(writer.addImage({ handle: 'myImg', buffer }));
+          });
+        });
+      })
+      .then(() => writer.placeImage({ handle: 'myImg', x: 50, y: 700, width: 100, height: 50 }))
       .then(() => writer.finish())
     )
   );

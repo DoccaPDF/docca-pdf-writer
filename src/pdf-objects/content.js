@@ -1,6 +1,7 @@
 import assert from 'assert';
 
 import { textToString } from '../pdf-content/text';
+import { toString as imageToString } from '../pdf-content/image';
 
 const content = {
   Type: 'Content',
@@ -28,6 +29,15 @@ const content = {
       this.data += textToString(text);
     } else {
       this.data = textToString(text);
+    }
+  },
+
+  addImage ({ handle, width, height, x, y }) {
+    const image = imageToString({ handle, width, height, x, y });
+    if (this.data) {
+      this.data += image;
+    } else {
+      this.data = image;
     }
   }
 };

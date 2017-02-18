@@ -13,8 +13,11 @@ import Info from './pdf-objects/info';
 import Page from './pdf-objects/page';
 import Pages from './pdf-objects/pages';
 import Resources from './pdf-objects/resources';
+import XObject from './pdf-objects/xobject';
 
 import Trailer from './pdf-objects/trailer';
+
+import Image from './image';
 
 import { xref } from './utils';
 
@@ -89,7 +92,7 @@ const writer = {
     this.content = Content({ ...content, id: ++this.idCounter });
     this.page.addContent(this.content);
     if (currentContent) {
-      return this.writeObject(currentContent.id, asPdfStream(currentContent));
+      return this.writeObject(currentContent.id, asPdfStream(currentContent, { deflate: false }));
     }
     return Promise.resolve();
   },
@@ -109,6 +112,46 @@ const writer = {
       return this.content.addText([text]);
     }
     return this.content.addText(text);
+  },
+
+  writeImage (image) {
+    const imageObj = XObject({
+      ...image,
+      id: ++this.idCounter
+    });
+    return this.writeObject(imageObj.id, asPdfStream(imageObj))
+    .then(() => imageObj);
+  },
+
+  /**
+   * add an image to the PDF
+   * @param {String} options.handle  identifier used in calls to placeImage
+   * @param {[type]} options.buffer  image file buffer
+   */
+  addImage ({ handle, buffer }) {
+    return Image(buffer)
+    .then(image => {
+      if (image.SMask) {
+        return this.writeImage(image.SMask)
+        .then(smaskObj => {
+          image.SMask = smaskObj;
+          return this.writeImage(image);
+        });
+      }
+      return this.writeImage(image);
+    });
+  },
+
+  /**
+   * place an image on the current page
+   * @param {String} handle          the name of an image previously added to the document
+   * @param {Number} options.width   the width to display the image at
+   * @param {Number} options.height  the height to display the image at
+   * @param {Number} options.x       the horizontal position of the bottom left corner of the image
+   * @param {Number} options.y       the vertical position of the bottom left corner of the image
+   */
+  placeImage ({ handle, width, height, x, y }) {
+    return this.content.addImage({ handle, width, height, x, y });
   },
 
   /**
@@ -185,7 +228,7 @@ const writer = {
     const catalog = Catalog({ Pages: this.pages, id: ++this.idCounter });
     return this.writeObject(this.pages.id, asPdfObject(this.pages))
     .then(() => this.writeObject(this.page.id, asPdfObject(this.page)))
-    .then(() => this.writeObject(this.content.id, asPdfStream(this.content)))
+    .then(() => this.writeObject(this.content.id, asPdfStream(this.content, { deflate: false })))
     .then(() => this.writeObject(catalog.id, asPdfObject(catalog)))
     .then(() => Info({ ..._pick(this, Info().keys), id: ++this.idCounter }))
     .then(info => this.writeObject(info.id, asPdfObject(info)).then(() => info))
