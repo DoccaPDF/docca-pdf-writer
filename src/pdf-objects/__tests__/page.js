@@ -45,7 +45,7 @@ describe('Page', () => {
     expect(page).toEqual(expect.objectContaining({
       id: 1,
       Type: 'Page',
-      Resources: `4 0 R`
+      Resources: { "id": 4 }
     }));
   });
 

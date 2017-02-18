@@ -28,17 +28,21 @@ const writer = {
   currentPage: undefined,
 
   /**
-   * create a new page to add content to
+   * create a new page
    * @param {Object} page
    * @param {Object} [page.Resources]
    * @param {Object} [page.MediaBox]
    */
   addPage (page) {
     const currentPage = this.page;
+    const resources = page.Resources
+      ? Resources({ ...page.Resources, id: ++this.idCounter })
+      : Resources({ id: ++this.idCounter });
+
     this.page = Page({
-      Resources: this.defaultResources,
       MediaBox: this.mediaBox,
       ...page,
+      Resources: resources,
       Parent: this.pages,
       id: ++this.idCounter
     });
@@ -47,7 +51,8 @@ const writer = {
     return this.addContent()
     .then(() => {
       if (currentPage) {
-        return this.writeObject(currentPage.id, asPdfObject(currentPage));
+        return this.writeObject(currentPage.Resources.id, asPdfObject(currentPage.Resources))
+        .then(() => this.writeObject(currentPage.id, asPdfObject(currentPage)));
       }
     });
   },
@@ -67,19 +72,6 @@ const writer = {
   },
 
   /**
-   * add a resources object to the PDF file
-   * @param {Object} props
-   * @param {Object} props.ProcSet
-   * @param {Object} props.Font
-   * @return {Promise} resolves to the resources object
-   */
-  addResources (props) {
-    const resources = Resources({ ...props, id: ++this.idCounter });
-    return this.writeObject(resources.id, asPdfObject(resources))
-    .then(() => resources);
-  },
-
-  /**
    * add a content object to the current page
    * @param {Object} content
    * @param {String} content.data  PDF operations
@@ -91,6 +83,23 @@ const writer = {
     if (currentContent) {
       return this.writeObject(currentContent.id, asPdfStream(currentContent));
     }
+    return Promise.resolve();
+  },
+
+  /**
+   * add resources to the current page resources object
+   * @param {Object} resources
+   * @param {Object} resources.Font           fonts keyed by handle
+   * @param {Object} resources.Font.<handle>  object with id: fontId
+   * @example
+   * page.addResources({
+   *   Font: {
+   *     F1: { id: 42 }
+   *   }
+   * })
+   */
+  addResources (resources) {
+    this.page.addResources(resources);
     return Promise.resolve();
   },
 
@@ -154,26 +163,7 @@ const writer = {
     this.fileOffset = 0; // keep track of where the next object will be written
 
     // write the file header
-    return this.write(new Buffer(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`), 'binary')
-    .then(() => {
-      // write a default font object
-      return this.addFont({
-        BaseFont: 'Helvetica',
-        Subtype: 'Type1',
-        Encoding: 'WinAnsiEncoding'
-      });
-    })
-    .then(font => {
-      // write a default resources object
-      return this.addResources({
-        ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI'],
-        Font: { F1: font }
-      });
-    })
-    .then(resources => {
-      // keep the resources object for later
-      this.defaultResources = resources;
-    });
+    return this.write(new Buffer(`%PDF-${this.pdfVersion}\n%\xFF\xFF\xFF\xFF\n`), 'binary');
   },
 
   /**
@@ -184,6 +174,7 @@ const writer = {
   finish () {
     const catalog = Catalog({ Pages: this.pages, id: ++this.idCounter });
     return this.writeObject(this.pages.id, asPdfObject(this.pages))
+    .then(() => this.writeObject(this.page.Resources.id, asPdfObject(this.page.Resources)))
     .then(() => this.writeObject(this.page.id, asPdfObject(this.page)))
     .then(() => this.writeObject(this.content.id, asPdfStream(this.content)))
     .then(() => this.writeObject(catalog.id, asPdfObject(catalog)))
