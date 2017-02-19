@@ -159,7 +159,11 @@ const writer = {
    * @param {Number} options.x       the horizontal position of the bottom left corner of the image
    * @param {Number} options.y       the vertical position of the bottom left corner of the image
    */
-  placeImage ({ handle, width, height, x, y }) {
+  placeImage ({ id, handle, width, height, x, y }) {
+    if (id) {
+      return this.addResources({ XObject: { [handle]: { id } } })
+      .then(() => this.content.addImage({ handle, width, height, x, y }));
+    }
     return this.content.addImage({ handle, width, height, x, y });
   },
 

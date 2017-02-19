@@ -2,6 +2,22 @@ import fs from 'fs';
 
 import Writer from '../';
 
+function readFile (filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, buffer) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(buffer);
+    });
+  });
+}
+
+function readAndAddImage (writer, handle, filePath) {
+  return readFile(filePath)
+  .then(buffer => writer.addImage({ handle, buffer }));
+}
+
 describe('writer', () => {
   it('creates a writer instance', () =>
     Writer({ streamOut: fs.createWriteStream(`./tmp/creates-writer.pdf`) })
@@ -53,65 +69,38 @@ describe('writer', () => {
 
         .then(() => writer.addText({ x: 10, y: 820, font: 'F1', size: 16, text: 'Images added once, placed twice' }))
 
-        .then(() => {
-          return new Promise((resolve, reject) => {
-            fs.readFile('./test/fixtures/docca-logo-small-red.png', (err, buffer) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(writer.addImage({ handle: 'myPngR', buffer }));
-            });
-          });
-        })
-        .then(image => writer.addResources({ XObject: { myPngR: { id: image.id } } }))
-        .then(() => writer.placeImage({ handle: 'myPngR', x: 80, y: 750, width: 100, height: 35 }))
+        // place an image once, including the image id to automatically add it to the page resources
+        .then(() => readFile('./test/fixtures/docca-logo-small-red.png'))
+        .then(buffer => writer.addImage({ handle: 'myPngR', buffer }))
+        .then(image => writer.placeImage({ id: image.id, handle: 'myPngR', x: 80, y: 750, width: 100, height: 35 }))
 
-        .then(() => {
-          return new Promise((resolve, reject) => {
-            fs.readFile('./test/fixtures/docca-logo-alpha.png', (err, buffer) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(writer.addImage({ handle: 'myPngA', buffer }));
-            });
-          });
-        })
+        // place an image twice after manually adding the image to the page resources
+        .then(() => readFile('./test/fixtures/docca-logo-alpha.png'))
+        .then(buffer => writer.addImage({ handle: 'myPngA', buffer }))
         .then(image => writer.addResources({ XObject: { myPngA: { id: image.id } } }))
         .then(() => writer.placeImage({ handle: 'myPngA', x: 50, y: 800, width: 275, height: 96.5 }))
         .then(() => writer.placeImage({ handle: 'myPngA', x: 400, y: 800, width: 91.6, height: 32.2 }))
         .then(() => writer.addText({ x: 380, y: 740, font: 'F1', size: 12, text: 'PNG with Alpha channel' }))
         .then(() => writer.addText({ x: 380, y: 720, font: 'F1', size: 12, text: 'placed over red docca image' }))
 
-        .then(() => {
-          return new Promise((resolve, reject) => {
-            fs.readFile('./test/fixtures/docca-logo.png', (err, buffer) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(writer.addImage({ handle: 'myPng', buffer }));
-            });
-          });
-        })
-        .then(image => writer.addResources({ XObject: { myPng: { id: image.id } } }))
-        .then(() => writer.placeImage({ handle: 'myPng', x: 50, y: 680, width: 275, height: 96.5 }))
-        .then(() => writer.placeImage({ handle: 'myPng', x: 400, y: 680, width: 91.6, height: 32.2 }))
+        // place an image twice, including the image id to automatically add it to the page resources
+        // (it's ok to include the id in multiple placements)
+        .then(() => readFile('./test/fixtures/docca-logo.png'))
+        .then(buffer => writer.addImage({ handle: 'myPng', buffer }))
+        .then(image =>
+          writer.placeImage({ id: image.id, handle: 'myPng', x: 50, y: 680, width: 275, height: 96.5 })
+          .then(() => writer.placeImage({ id: image.id, handle: 'myPng', x: 400, y: 680, width: 91.6, height: 32.2 }))
+        )
         .then(() => writer.addText({ x: 380, y: 620, font: 'F1', size: 12, text: 'PNG no Alpha channel' }))
 
-        .then(() => {
-          return new Promise((resolve, reject) => {
-            fs.readFile('./test/fixtures/docca-logo.jpg', (err, buffer) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(writer.addImage({ handle: 'myJpg', buffer }));
-            });
-          });
-        })
-        .then(image => writer.addResources({ XObject: { myJpg: { id: image.id } } }))
-        .then(() => writer.placeImage({ handle: 'myJpg', x: 50, y: 560, width: 275, height: 96.5 }))
+        // place an image twice, including the image id only the first time as we don't need to do it more than once
+        .then(() => readFile('./test/fixtures/docca-logo.jpg'))
+        .then(buffer => writer.addImage({ handle: 'myJpg', buffer }))
+        .then(image => writer.placeImage({ id: image.id, handle: 'myJpg', x: 50, y: 560, width: 275, height: 96.5 }))
         .then(() => writer.placeImage({ handle: 'myJpg', x: 400, y: 560, width: 91.6, height: 32.2 }))
         .then(() => writer.addText({ x: 380, y: 500, font: 'F1', size: 12, text: 'JPEG' }))
 
+        // add another page
         .then(() => writer.addPage({ MediaBox: [0, 0, 595, 841] }))
         .then(() => writer.addResources({ Font: { F1: font } }))
         .then(() => writer.addText([
