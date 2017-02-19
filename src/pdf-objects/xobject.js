@@ -14,7 +14,7 @@ const xobject = {
     return {
       Type: '/XObject',
       Subtype: `/${this.Subtype}`,
-      Length: this.data.length,
+      Length: this.data.length + 1,
       BitsPerComponent: this.BitsPerComponent,
       ColorSpace: `/${this.ColorSpace}`,
       Width: this.Width,

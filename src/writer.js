@@ -128,7 +128,7 @@ const writer = {
       ...image,
       id: ++this.idCounter
     });
-    return this.writeObject(imageObj.id, asPdfStream(imageObj))
+    return this.writeObject(imageObj.id, asPdfStream(imageObj, { deflate: false }))
     .then(() => imageObj);
   },
 

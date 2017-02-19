@@ -14,16 +14,17 @@ describe('object-serialise', () => {
           };
         }
       };
-      const expected = `3 0 obj
-<<
-/key1 value1
-/key3 value3
->>
-stream
-Hello!
-endstream
-endobj
-`;
+//       const expected = `3 0 obj
+// <<
+// /key1 value1
+// /key3 value3
+// >>
+// stream
+// Hello!
+// endstream
+// endobj
+// `;
+      const expected = new Buffer([51, 32, 48, 32, 111, 98, 106, 10, 60, 60, 10, 47, 107, 101, 121, 49, 32, 118, 97, 108, 117, 101, 49, 10, 47, 107, 101, 121, 51, 32, 118, 97, 108, 117, 101, 51, 10, 62, 62, 10, 115, 116, 114, 101, 97, 109, 10, 72, 101, 108, 108, 111, 33, 10, 101, 110, 100, 115, 116, 114, 101, 97, 109, 10, 101, 110, 100, 111, 98, 106, 10]);
       const actual = asPdfStream(pdfObject, { deflate: false });
       expect(actual).toEqual(expected);
     });

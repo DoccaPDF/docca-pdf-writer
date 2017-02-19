@@ -13,7 +13,8 @@ const resources = {
   flattenKeys () {
     return {
       ProcSet: `[ /${this.ProcSet.join(' /')} ]`,
-      Font: this.Font && asPdfDictionary(this.Font)
+      Font: this.Font && asPdfDictionary(this.Font),
+      XObject: this.XObject && asPdfDictionary(this.XObject)
     };
   },
 
@@ -24,6 +25,15 @@ const resources = {
   addFonts (obj) {
     const refObj = _mapValues(obj, fobj => ref(fobj));
     this.Font = _merge({}, this.Font, refObj);
+  },
+
+  /**
+   * add xobject resources
+   * @param {Object}  xobjects keyed by handle
+   */
+  addXObjects (obj) {
+    const refObj = _mapValues(obj, xobj => ref(xobj));
+    this.XObject = _merge({}, this.XObject, refObj);
   },
 
   /**
@@ -42,6 +52,9 @@ const resources = {
     if (resources.Font) {
       this.addFonts(resources.Font);
     }
+    if (resources.XObject) {
+      this.addXObjects(resources.XObject);
+    }
   }
 
 };
@@ -57,7 +70,7 @@ const resources = {
  */
 export default function Resources (props) {
   assert(props.id, `id is required`);
-  const initProps = _omit(props, 'Font');
+  const initProps = _omit(props, 'Font', 'XObject');
   const resourcesI = Object.assign(Object.create(resources), {
     ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI'],
     ...initProps

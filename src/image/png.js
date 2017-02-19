@@ -32,47 +32,55 @@ export function splitAlpha (png) {
   return { image, alpha };
 }
 
-export default function getPNG (buffer) {
-  const png = PNGjs.sync.read(buffer);
-  const channels = splitAlpha(png);
+/**
+ * get pdf image data Object
+ * @param {Object} pngjsInstance
+ * @param {Object} props
+ * @param {Object} props.data  image data (required)
+ * any object property can be overridden by including it in props
+ */
+export function pdfImageData (pngjsInstance, props) {
+  return {
+    Subtype: 'Image',
+    Filter: 'FlateDecode',
+    BitsPerComponent: pngjsInstance.depth,
+    Width: pngjsInstance.width,
+    Height: pngjsInstance.height,
+    ColorSpace: pngjsInstance.color ? 'DeviceRGB' : 'DeviceGray',
+    ...props
+  };
+}
+
+/**
+ * deflate image data with zlib
+ * @param {Buffer}  image
+ */
+export function deflate (image) {
   return new Promise((resolve, reject) => {
-    zlib.deflate(channels.image, (err, data) => {
+    zlib.deflate(image, (err, data) => {
       if (err) {
         reject(err);
       }
       resolve(data);
     });
-  })
+  });
+}
+
+/**
+ * returns PDF image data for a PNG
+ * @param {Buffer}    png image data
+ * @returns {Object}  PDF object data
+ */
+export default function getPNG (buffer) {
+  const png = PNGjs.sync.read(buffer);
+  const channels = splitAlpha(png);
+  return deflate(channels.image)
   .then(data => {
-    const image = {
-      Subtype: 'Image',
-      Filter: 'FlateDecode',
-      BitsPerComponent: png.depth,
-      Width: png.width,
-      Height: png.height,
-      ColorSpace: png.color ? 'DeviceRGB' : 'DeviceGray',
-      data
-    };
+    const image = pdfImageData(png, { data });
     if (channels.alpha) {
-      return new Promise((resolve, reject) => {
-        zlib.deflate(channels.alpha, (err, alphaData) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(alphaData);
-        });
-      })
+      return deflate(channels.alpha)
       .then(alphaData => {
-        const smask = {
-          Subtype: 'Image',
-          Filter: 'FlateDecode',
-          BitsPerComponent: 8,
-          Width: png.width,
-          Height: png.height,
-          ColorSpace: 'DeviceGray',
-          data: zlib.deflateSync(channels.alpha)
-        };
-        image.SMask = smask;
+        image.SMask = pdfImageData(png, { data: alphaData, ColorSpace: 'DeviceGray' });
         return image;
       });
     }

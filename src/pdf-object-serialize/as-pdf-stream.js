@@ -32,15 +32,15 @@ export default function asPdfStream (pdfObject, { deflate = true } = {}) {
   }
   const keys = pdfObject.keys;
   const flatObject = pdfObject.flattenKeys();
-  let data = pdfObject.data;
-  const lines = [
-    head(pdfObject),
-    `<<`,
-    asPdfDictionaryLines(keys, flatObject) + `>>`,
-    `stream`,
+  const data = new Buffer(pdfObject.data, 'binary');
+  return Buffer.concat([
+    new Buffer([
+      head(pdfObject),
+      `<<`,
+      asPdfDictionaryLines(keys, flatObject) + `>>`,
+      `stream\n`
+    ].join('\n')),
     data,
-    `endstream`,
-    `endobj\n`
-  ];
-  return lines.join('\n');
+    new Buffer(`\nendstream\nendobj\n`)
+  ]);
 }
