@@ -22,10 +22,8 @@ import Image from './image';
 import { xref } from './utils';
 
 import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
-import asPdfObject from './pdf-object-serialize/as-pdf-object';
-import asPdfStream from './pdf-object-serialize/as-pdf-stream';
 
-const writer = {
+export const writer = {
   idCounter: 0,
   pages: undefined,
   currentPage: undefined,
@@ -52,12 +50,7 @@ const writer = {
     this.pages.addPage(this.page);
 
     return this.addContent()
-    .then(() => {
-      if (currentPage) {
-        return this.writeObject(currentPage.Resources.id, asPdfObject(currentPage.Resources))
-        .then(() => this.writeObject(currentPage.id, asPdfObject(currentPage)));
-      }
-    });
+    .then(() => this.writePage(currentPage));
   },
 
   /**
@@ -70,8 +63,7 @@ const writer = {
    */
   addFont (props) {
     const font = Font({ ...props, id: ++this.idCounter });
-    return this.writeObject(font.id, asPdfObject(font))
-    .then(() => font);
+    return this.writeObject(font);
   },
 
   /**
@@ -83,10 +75,7 @@ const writer = {
     const currentContent = this.content;
     this.content = Content({ ...content, id: ++this.idCounter });
     this.page.addContent(this.content);
-    if (currentContent) {
-      return this.writeObject(currentContent.id, asPdfStream(currentContent, { deflate: false }));
-    }
-    return Promise.resolve();
+    return this.writeObject(currentContent);
   },
 
   /**
@@ -123,15 +112,6 @@ const writer = {
     return this.content.addText(text);
   },
 
-  writeImage (image) {
-    const imageObj = XObject({
-      ...image,
-      id: ++this.idCounter
-    });
-    return this.writeObject(imageObj.id, asPdfStream(imageObj, { deflate: false }))
-    .then(() => imageObj);
-  },
-
   /**
    * add an image to the PDF
    * @param {String} options.handle  identifier used in calls to placeImage
@@ -141,18 +121,19 @@ const writer = {
     return Image(buffer)
     .then(image => {
       if (image.SMask) {
-        return this.writeImage(image.SMask)
+        return this.writeObject(XObject({ ...image.SMask, id: ++this.idCounter }))
         .then(smaskObj => {
           image.SMask = smaskObj;
-          return this.writeImage(image);
+          return this.writeObject(XObject({ ...image, id: ++this.idCounter }));
         });
       }
-      return this.writeImage(image);
+      return this.writeObject(XObject({ ...image, id: ++this.idCounter }));
     });
   },
 
   /**
    * place an image on the current page
+   * @param {Number} [id]            the font object id - image resource will be added to page if id is supplied
    * @param {String} handle          the name of an image previously added to the document
    * @param {Number} options.width   the width to display the image at
    * @param {Number} options.height  the height to display the image at
@@ -168,15 +149,31 @@ const writer = {
   },
 
   /**
+   * write a page and it's resources to the PDF
+   * @param {Object}  page  a page object
+   * @returns {Promise}  resolves to the page object
+   */
+  writePage (page) {
+    if (!page) {
+      return Promise.resolve();
+    }
+    return this.writeObject(page.Resources)
+    .then(() => this.writeObject(page));
+  },
+
+  /**
    * write a PDF object to the file
    * records the object's file offset in objectFileOffsets for the xref
    * @param   {Number}        id    PDF object ID
    * @param   {String|Buffer} data
    * @returns {Promise}
    */
-  writeObject (id, data) {
-    this.objectFileOffsets[id] = this.fileOffset;
-    return this.write(data);
+  writeObject (obj) {
+    if (!obj) {
+      return Promise.resolve();
+    }
+    this.objectFileOffsets[obj.id] = this.fileOffset;
+    return this.write(obj.toPDF()).then(() => obj);
   },
 
   /**
@@ -220,14 +217,14 @@ const writer = {
    */
   finish () {
     const catalog = Catalog({ Pages: this.pages, id: ++this.idCounter });
-    return this.writeObject(this.pages.id, asPdfObject(this.pages))
-    .then(() => this.writeObject(this.page.Resources.id, asPdfObject(this.page.Resources)))
-    .then(() => this.writeObject(this.page.id, asPdfObject(this.page)))
-    .then(() => this.writeObject(this.content.id, asPdfStream(this.content, { deflate: false })))
-    .then(() => this.writeObject(catalog.id, asPdfObject(catalog)))
-    .then(() => Info({ ..._pick(this, Info().keys), id: ++this.idCounter }))
-    .then(info => this.writeObject(info.id, asPdfObject(info)).then(() => info))
-    .then(info => {
+    const info = Info({ ..._pick(this, Info().keys), id: ++this.idCounter });
+
+    return this.writeObject(this.pages)
+    .then(() => this.writePage(this.page))
+    .then(() => this.writeObject(this.content))
+    .then(() => this.writeObject(catalog))
+    .then(() => this.writeObject(info))
+    .then(() => {
       const trailer = Trailer({
         ID: [this.id, this.id],
         Size: Object.keys(this.objectFileOffsets).length + 1,

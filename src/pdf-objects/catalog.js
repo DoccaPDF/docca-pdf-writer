@@ -2,6 +2,7 @@ import assert from 'assert';
 import _omit from 'lodash/omit';
 
 import { ref } from '../utils';
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
 
 const catalog = {
   Type: 'Catalog',
@@ -17,6 +18,10 @@ const catalog = {
 
   setPages (obj) {
     this.Pages = ref(obj);
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 
 };

@@ -1,6 +1,7 @@
 import assert from 'assert';
 
 import { ref } from '../utils';
+import asPdfStream from '../pdf-object-serialize/as-pdf-stream';
 
 const xobject = {
   Type: 'XObject',
@@ -24,6 +25,10 @@ const xobject = {
       Mask: this.Mask,
       SMask: this.SMask && ref(this.SMask)
     };
+  },
+
+  toPDF () {
+    return asPdfStream(this, { deflate: false });
   }
 
 };

@@ -3,6 +3,8 @@ import assert from 'assert';
 import { textToString } from '../pdf-content/text';
 import { toString as imageToString } from '../pdf-content/image';
 
+import asPdfStream from '../pdf-object-serialize/as-pdf-stream';
+
 const content = {
   Type: 'Content',
 
@@ -39,6 +41,10 @@ const content = {
     } else {
       this.data = image;
     }
+  },
+
+  toPDF () {
+    return asPdfStream(this);
   }
 };
 

@@ -2,6 +2,8 @@ import _isUndefined from 'lodash/isUnDefined';
 import _map from 'lodash/map';
 import _padStart from 'lodash/padStart';
 
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
+
 function formatDate (date) {
   const parts = _map(['Date', 'Hours', 'Minutes', 'Seconds'], part =>
     _padStart(date[`getUTC${part}`](), 2, '0')
@@ -30,6 +32,10 @@ const info = {
       }
       return result;
     }, {});
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 };
 

@@ -4,6 +4,7 @@ import _mapValues from 'lodash/mapValues';
 import _merge from 'lodash/merge';
 
 import { ref, asPdfDictionary } from '../utils';
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
 
 const resources = {
   Type: 'Resources',
@@ -55,6 +56,10 @@ const resources = {
     if (resources.XObject) {
       this.addXObjects(resources.XObject);
     }
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 
 };

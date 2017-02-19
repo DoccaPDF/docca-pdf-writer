@@ -3,6 +3,7 @@ import _forEach from 'lodash/forEach';
 import _omit from 'lodash/omit';
 
 import { arrayToString, ref } from '../utils';
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
 
 const page = {
   Type: 'Page',
@@ -68,6 +69,10 @@ const page = {
     if (obj) {
       this.MediaBox = obj;
     }
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 };
 

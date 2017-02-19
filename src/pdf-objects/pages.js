@@ -3,6 +3,7 @@ import _forEach from 'lodash/forEach';
 import _omit from 'lodash/omit';
 
 import { arrayToString, ref } from '../utils';
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
 
 const pages = {
   Type: 'Pages',
@@ -22,6 +23,10 @@ const pages = {
       this.Kids = [];
     }
     this.Kids.push(ref(kid));
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 };
 

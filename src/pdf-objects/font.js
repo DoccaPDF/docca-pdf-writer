@@ -1,5 +1,7 @@
 import assert from 'assert';
 
+import asPdfObject from '../pdf-object-serialize/as-pdf-object';
+
 const font = {
   Type: 'Font',
 
@@ -15,6 +17,10 @@ const font = {
       BaseFont: `/${this.BaseFont}`,
       Encoding: `/${this.Encoding}`
     };
+  },
+
+  toPDF () {
+    return asPdfObject(this);
   }
 };
 
