@@ -1,9 +1,13 @@
 
 # Docca PDF Writer
 
-This repo contains the first stage of a re-write of the Docca PDF writer.
+A re-write of the original Docca PDF writer designed with extensibility and memory use in mind.
 
-This initial commit has the minimum functionality required to write Hello World! to a PDF in order to keep it as simple as possible. At the same time it is designed to be extendable to get it to the point where it can produce PDFA1-B valid files as the current Docca writer does now (soon to be released).
+- set PDF info
+- add standard PDF fonts
+- write text
+- add JPEG and PNG images once
+- place images in pages multiple times
 
 See [Building a PDF writer](building-pdf-writer.md) for a quick PDF primer.
 
