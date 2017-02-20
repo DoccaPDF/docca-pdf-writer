@@ -55,17 +55,3 @@ export function asPdfDictionary (pdfObject) {
 export function arrayToString (values) {
   return values && values.length && `[${values.join(' ')}]`;
 }
-
-export function xref (offsets, trailerStr) {
-  const lines = [
-    'xref',
-    `0 ${offsets.length + 1}`,
-    '0000000000 65535 f '
-  ];
-  offsets.forEach(offset => {
-    const formatted = `0000000000${offset}`.slice(-10);
-    lines.push(`${formatted} 00000 n `);
-  });
-  lines.push(`trailer\n${trailerStr}`);
-  return lines.join('\n');
-}

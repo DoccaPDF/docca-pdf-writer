@@ -2,8 +2,6 @@ import uuid from 'uuid';
 
 import _defaults from 'lodash/defaults';
 import _isArray from 'lodash/isArray';
-import _keys from 'lodash/keys';
-import _map from 'lodash/map';
 import _pick from 'lodash/pick';
 
 import Catalog from './pdf-objects/catalog';
@@ -16,12 +14,9 @@ import Resources from './pdf-objects/resources';
 import XObject from './pdf-objects/xobject';
 
 import Trailer from './pdf-objects/trailer';
+import XRef from './pdf-objects/xref';
 
 import Image from './image';
-
-import { xref } from './utils';
-
-import asPdfDictionary from './pdf-object-serialize/as-pdf-dictionary';
 
 export const writer = {
   idCounter: 0,
@@ -161,6 +156,17 @@ export const writer = {
     .then(() => this.writeObject(page));
   },
 
+  writeXref ({ catalog, info }) {
+    const trailer = Trailer({
+      ID: [this.id, this.id],
+      Size: Object.keys(this.objectFileOffsets).length + 1,
+      Root: catalog,
+      Info: info
+    });
+    const xref = XRef({ startx: this.fileOffset, trailer, offsets: this.objectFileOffsets });
+    return this.writeObject(xref);
+  },
+
   /**
    * write a PDF object to the file
    * records the object's file offset in objectFileOffsets for the xref
@@ -172,7 +178,9 @@ export const writer = {
     if (!obj) {
       return Promise.resolve();
     }
-    this.objectFileOffsets[obj.id] = this.fileOffset;
+    if (obj.id) {
+      this.objectFileOffsets[obj.id] = this.fileOffset;
+    }
     return this.write(obj.toPDF()).then(() => obj);
   },
 
@@ -224,23 +232,7 @@ export const writer = {
     .then(() => this.writeObject(this.content))
     .then(() => this.writeObject(catalog))
     .then(() => this.writeObject(info))
-    .then(() => {
-      const trailer = Trailer({
-        ID: [this.id, this.id],
-        Size: Object.keys(this.objectFileOffsets).length + 1,
-        Root: catalog,
-        Info: info
-      });
-      const startx = this.fileOffset;
-
-      // sort offsets by object ids
-      const offsets = _map(
-        _keys(this.objectFileOffsets).sort((a, b) => +a - +b), id => this.objectFileOffsets[id]
-      );
-
-      return this.write(xref(offsets, asPdfDictionary(trailer)))
-      .then(() => this.write(`startxref\n${startx}\n%%EOF`));
-    });
+    .then(() => this.writeXref({ catalog, info }));
   }
 };
 

@@ -13,11 +13,6 @@ function readFile (filePath) {
   });
 }
 
-function readAndAddImage (writer, handle, filePath) {
-  return readFile(filePath)
-  .then(buffer => writer.addImage({ handle, buffer }));
-}
-
 describe('writer', () => {
   it('creates a writer instance', () =>
     Writer({ streamOut: fs.createWriteStream(`./tmp/creates-writer.pdf`) })
