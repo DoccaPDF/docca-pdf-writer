@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects annot creates a new object 1`] = `
+Object {
+  "A": Object {
+    "S": "URI",
+    "URI": "http://docca.io",
+  },
+  "H": "I",
+  "Rect": Array [
+    10,
+    20,
+    30,
+    40,
+  ],
+  "Subtype": "Link",
+  "id": 42,
+}
+`;
+
+exports[`pdf-objects annot flattens keys values 1`] = `
+Object {
+  "A": "<<
+/S /URI
+/URI (http://docca.io)
+>>
+",
+  "BS": undefined,
+  "C": undefined,
+  "Dest": undefined,
+  "F": undefined,
+  "H": "/I",
+  "Rect": "[10 20 30 40]",
+  "Subtype": "/Link",
+  "Type": "/Annot",
+}
+`;
+
+exports[`pdf-objects annot returns a PDF object 1`] = `
+"42 0 obj
+<<
+/Type /Annot
+/A <<
+/S /URI
+/URI (http://docca.io)
+>>
+
+/Subtype /Link
+/Rect [10 20 30 40]
+/H /I
+>>
+endobj
+"
+`;

@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects xref creates a new object 1`] = `
+Object {
+  "offsets": Object {
+    "1": 104443,
+    "2": 104890,
+    "3": 19,
+  },
+  "startx": 105263,
+  "trailer": Object {
+    "ID": Array [
+      "c7fbe2a37bce46eeaa1b16c7c84a7c08",
+      "c7fbe2a37bce46eeaa1b16c7c84a7c08",
+    ],
+    "Info": Object {
+      "Author": "Me",
+      "CreationDate": 2017-02-13T00:00:00.000Z,
+      "Creator": "Jason",
+      "Keywords": "test info",
+      "ModDate": 2017-02-14T00:00:00.000Z,
+      "Producer": "docca pdf writer",
+      "Subject": "Info Test",
+      "Title": "My Title",
+      "Trapped": true,
+      "id": 18,
+    },
+    "Root": "2 0 R",
+    "Size": 19,
+  },
+}
+`;
+
+exports[`pdf-objects xref returns a PDF object 1`] = `
+"xref
+0 4
+0000000000 65535 f 
+0000104443 00000 n 
+0000104890 00000 n 
+0000000019 00000 n 
+trailer
+<<
+/ID [<c7fbe2a37bce46eeaa1b16c7c84a7c08><c7fbe2a37bce46eeaa1b16c7c84a7c08>]
+/Size 19
+/Info 18 0 R
+/Root 2 0 R
+>>
+
+startxref
+105263
+%%EOF"
+`;

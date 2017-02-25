@@ -95,9 +95,22 @@ describe('writer', () => {
         .then(() => writer.placeImage({ handle: 'myJpg', x: 400, y: 560, width: 91.6, height: 32.2 }))
         .then(() => writer.addText({ x: 380, y: 500, font: 'F1', size: 12, text: 'JPEG' }))
 
+        .then(() => writer.addText({ x: 10, y: 400, font: 'F1', size: 16, text: 'Link to Web' }))
+        .then(() => writer.addLink({ x: 10, y: 400, x2: 100, y2: 420, target: 'https://docca.io' }))
+
+        .then(() => writer.addText({ x: 10, y: 360, font: 'F1', size: 16, text: 'Link to Page 2' }))
+        // internal document links must begin with a hash and have a matching page anchor
+        .then(() => writer.addLink({ x: 10, y: 360, x2: 100, y2: 380, target: '#Page 2' }))
+
+        .then(() => writer.addPageAnchor({ name: 'Page 1 mid', top: 400 }))
+        .then(() => writer.addText({ x: 10, y: 340, font: 'F1', size: 16, text: 'Link to Middle of Page 1' }))
+        .then(() => writer.addLink({ x: 10, y: 340, x2: 100, y2: 360, target: '#Page 1 mid' }))
+
         // add another page
         .then(() => writer.addPage({ MediaBox: [0, 0, 595, 841] }))
         .then(() => writer.addResources({ Font: { F1: font } }))
+        // add a page anchor for this page
+        .then(() => writer.addPageAnchor({ name: 'Page 2' }))
         .then(() => writer.addText([
           { x: 10, y: 800, font: 'F1', size: 16, text: 'Hello Again!' },
           { x: 200, y: 800, font: 'F1', size: 12, text: 'Page 2' }

@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects uri creates a new object 1`] = `
+Object {
+  "Base": "http://docca.io",
+  "id": 42,
+}
+`;
+
+exports[`pdf-objects uri flattens keys values 1`] = `
+Object {
+  "Base": "(http://docca.io)",
+  "Type": "/URI",
+}
+`;
+
+exports[`pdf-objects uri returns a PDF object 1`] = `
+"42 0 obj
+<<
+/Type /URI
+/Base (http://docca.io)
+>>
+endobj
+"
+`;

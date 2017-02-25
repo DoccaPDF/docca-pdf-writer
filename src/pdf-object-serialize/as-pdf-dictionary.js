@@ -8,6 +8,9 @@ import { asPdfDictionaryLines } from '../utils';
 export default function asPdfDictionary (pdfObject) {
   const keys = Object.keys(pdfObject);
   const flatObj = pdfObject.flattenKeys();
+  if (!Object.keys(flatObj).length) {
+    return;
+  }
   const lines = [
     `<<`,
     asPdfDictionaryLines(keys, flatObj) + `>>\n`

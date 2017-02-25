@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects border creates a new object 1`] = `
+Object {
+  "S": "S",
+  "W": 2,
+}
+`;
+
+exports[`pdf-objects border flattens keys values 1`] = `
+Object {
+  "D": undefined,
+  "S": "S",
+  "Type": "/Border",
+  "W": 2,
+}
+`;
+
+exports[`pdf-objects border returns a PDF object 1`] = `
+"undefined 0 obj
+<<
+/Type /Border
+/W 2
+/S S
+>>
+endobj
+"
+`;

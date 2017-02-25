@@ -116,8 +116,35 @@ Q
     });
 
     it('flattens keys values', () => {
-      const content = Content({ id: 1, data: 'Hello' });
-      expect(content.flattenKeys()).toEqual({ Length: 5 });
+      const content = Content({ id: 1 });
+      content.addText([{
+        x: 10, y: 40, font: "F1", size: 12, text: "Hello World!"
+      }]);
+      expect(content.flattenKeys()).toMatchSnapshot();
+    });
+
+    it('adds an image', () => {
+      const content = Content({ id: 1 });
+      content.addImage({ handle: 'I1', width: 20, height: 30, x: 40, y: 50 });
+      expect(content).toMatchSnapshot();
+    });
+
+    it('adds an image to existing text', () => {
+      const content = Content({ id: 1 });
+      content.addText([{
+        x: 10, y: 40, font: "F1", size: 12, text: "Hello World!"
+      }]);
+      content.addImage({ handle: 'I1', width: 20, height: 30, x: 40, y: 50 });
+      expect(content).toMatchSnapshot();
+    });
+
+    it('returns a PDF object', () => {
+      const content = Content({ id: 1 });
+      content.addText([{
+        x: 10, y: 40, font: "F1", size: 12, text: "Hello World!"
+      }]);
+      content.addImage({ handle: 'I1', width: 20, height: 30, x: 40, y: 50 });
+      expect(content.toPDF({ deflate: false }).toString()).toMatchSnapshot();
     });
   });
 });

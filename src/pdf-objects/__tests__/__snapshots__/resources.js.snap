@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects resources creates a new object 1`] = `
+Object {
+  "Font": Object {
+    "F1": "3 0 R",
+  },
+  "ProcSet": Array [
+    "PDF",
+    "Text",
+    "ImageB",
+    "ImageC",
+    "ImageI",
+  ],
+  "XObject": Object {
+    "X1": "5 0 R",
+  },
+  "id": 2,
+}
+`;
+
+exports[`pdf-objects resources flattens keys values 1`] = `
+Object {
+  "Font": "<<
+/F1 3 0 R
+>>
+",
+  "ProcSet": "[ /PDF /Text /ImageB /ImageC /ImageI ]",
+  "XObject": "<<
+/X1 5 0 R
+>>
+",
+}
+`;
+
+exports[`pdf-objects resources returns a PDF object 1`] = `
+"2 0 obj
+<<
+/ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+/Font <<
+/F1 3 0 R
+>>
+
+/XObject <<
+/X1 5 0 R
+>>
+
+>>
+endobj
+"
+`;

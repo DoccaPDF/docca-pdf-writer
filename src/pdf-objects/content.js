@@ -43,8 +43,8 @@ const content = {
     }
   },
 
-  toPDF () {
-    return asPdfStream(this);
+  toPDF ({ deflate = true } = {}) {
+    return asPdfStream(this, { deflate });
   }
 };
 

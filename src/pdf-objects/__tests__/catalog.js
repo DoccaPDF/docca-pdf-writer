@@ -1,4 +1,5 @@
 import Catalog from '../catalog';
+import Names from '../names';
 
 describe('pdf-objects', () => {
   describe('catalog', () => {
@@ -16,12 +17,21 @@ describe('pdf-objects', () => {
     it('flattens keys values', () => {
       const content = Catalog({
         id: 2,
-        Pages: { id: 3 }
+        Pages: { id: 3 },
+        Names: Names()
       });
-      expect(content.flattenKeys()).toEqual({
-        Type: `/Catalog`,
-        Pages: `3 0 R`
+      content.addNameDest({ name: 'myDest', page: { id: 1 }, left: 10, top: 10, zoom: 2 });
+      expect(content.flattenKeys()).toMatchSnapshot();
+    });
+
+    it('returns a PDF object', () => {
+      const content = Catalog({
+        id: 2,
+        Pages: { id: 3 },
+        Names: Names()
       });
+      content.addNameDest({ name: 'myDest', page: { id: 1 }, left: 10, top: 10, zoom: 2 });
+      expect(content.toPDF()).toMatchSnapshot();
     });
   });
 });

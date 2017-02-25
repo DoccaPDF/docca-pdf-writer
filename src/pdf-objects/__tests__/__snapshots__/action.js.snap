@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects GoTo Action creates a new object 1`] = `
+Object {
+  "D": "myDest",
+  "S": "GoTo",
+}
+`;
+
+exports[`pdf-objects GoTo Action flattens keys values 1`] = `
+Object {
+  "D": "(myDest)",
+  "S": "/GoTo",
+  "Type": "/Action",
+  "URI": undefined,
+}
+`;
+
+exports[`pdf-objects GoTo Action returns a PDF object 1`] = `
+"<<
+/S /GoTo
+/D (myDest)
+>>
+"
+`;
+
+exports[`pdf-objects URI Action creates a new object 1`] = `
+Object {
+  "S": "URI",
+  "URI": "http://docca.io",
+}
+`;
+
+exports[`pdf-objects URI Action flattens keys values 1`] = `
+Object {
+  "D": undefined,
+  "S": "/URI",
+  "Type": "/Action",
+  "URI": "(http://docca.io)",
+}
+`;
+
+exports[`pdf-objects URI Action returns a PDF object 1`] = `
+"<<
+/S /URI
+/URI (http://docca.io)
+>>
+"
+`;

@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects content adds an image 1`] = `
+Object {
+  "data": "q
+20 0 0 30 40 20 cm
+/I1 Do
+Q
+",
+  "id": 1,
+}
+`;
+
+exports[`pdf-objects content adds an image to existing text 1`] = `
+Object {
+  "data": "q
+/F1 12 Tf
+BT
+10 40 Td
+(Hello World!) Tj
+ET
+Q
+q
+20 0 0 30 40 20 cm
+/I1 Do
+Q
+",
+  "id": 1,
+}
+`;
+
+exports[`pdf-objects content flattens keys values 1`] = `
+Object {
+  "Length": 47,
+}
+`;
+
+exports[`pdf-objects content returns a PDF object 1`] = `
+"1 0 obj
+<<
+/Length 77
+>>
+stream
+q
+/F1 12 Tf
+BT
+10 40 Td
+(Hello World!) Tj
+ET
+Q
+q
+20 0 0 30 40 20 cm
+/I1 Do
+Q
+
+endstream
+endobj
+"
+`;

@@ -64,6 +64,5 @@ Writer({
     ]))
     .then(() => writer.finish());
   })
-)
 );
 ```

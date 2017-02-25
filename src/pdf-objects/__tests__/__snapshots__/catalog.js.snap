@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pdf-objects catalog flattens keys values 1`] = `
+Object {
+  "Names": "<<
+/Dests << /Names [(myDest) [1 0 R /XYZ 10 10 2]] >>
+>>
+",
+  "Pages": "3 0 R",
+  "Type": "/Catalog",
+}
+`;
+
+exports[`pdf-objects catalog returns a PDF object 1`] = `
+"2 0 obj
+<<
+/Type /Catalog
+/Pages 3 0 R
+/Names <<
+/Dests << /Names [(myDest) [1 0 R /XYZ 10 10 2]] >>
+>>
+
+>>
+endobj
+"
+`;

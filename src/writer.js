@@ -4,10 +4,13 @@ import _defaults from 'lodash/defaults';
 import _isArray from 'lodash/isArray';
 import _pick from 'lodash/pick';
 
+import Annot from './pdf-objects/annot';
+import Action from './pdf-objects/action';
 import Catalog from './pdf-objects/catalog';
 import Content from './pdf-objects/content';
 import Font from './pdf-objects/font';
 import Info from './pdf-objects/info';
+import Names from './pdf-objects/names';
 import Page from './pdf-objects/page';
 import Pages from './pdf-objects/pages';
 import Resources from './pdf-objects/resources';
@@ -98,13 +101,47 @@ export const writer = {
    * @param   {String} text.font  the font handle defined in the resources of the page
    * @param   {Number} text.size  the size of font to use
    * @param   {String} text.text  the text
-   * this should be modified to accept an array of text objects
    */
   addText (text) {
     if (!_isArray(text)) {
       return this.content.addText([text]);
     }
     return this.content.addText(text);
+  },
+
+  /**
+   * add a page link anchor
+   * @param {String}  anchor.name  the name of the link anchor
+   * @param {Number}  anchor.left  the coordinate on the page to be placed at the left of the window
+   * @param {Number}  anchor.top   the coordinate on the page to be placed at the top of the window
+   * @param {Number}  anchor.zoom  the factor to magnify the contents of the page to
+   */
+  addPageAnchor ({ name, left, top, zoom }) {
+    this.catalog.addNameDest({ name, page: this.page, left, top, zoom });
+    return Promise.resolve();
+  },
+
+  /**
+   * add a link to the current page
+   * @param   {Object} link       defines location, font, and link
+   * @param   {Number} link.x     place the link rectangle x points from the left
+   * @param   {Number} link.y     place the link rectangle y points from the bottom
+   * @param   {Number} link.x2    span the link rectangle to x points from the left
+   * @param   {Number} link.y2    span the link rectangle to y points from the bottom
+   */
+  addLink ({ x, y, x2, y2, target }) {
+    let annotProps = {
+      Subtype: 'Link',
+      Rect: [x, y, x2, y2]
+    };
+    if (/^#/.test(target)) {
+      annotProps.A = Action({ S: 'GoTo', D: target.replace(/^#/, '') });
+    } else {
+      annotProps.A = Action({ S: 'URI', URI: target });
+    }
+    const annot = Annot({ ...annotProps, id: ++this.idCounter });
+    this.page.addAnnotation(annot);
+    return this.writeObject(annot);
   },
 
   /**
@@ -211,6 +248,8 @@ export const writer = {
     });
 
     this.pages = Pages({ id: ++this.idCounter }); // just one of these for the whole file
+    this.catalog = Catalog({ Pages: this.pages, Names: Names(), id: ++this.idCounter });
+
     this.objectFileOffsets = {}; // keep track of where each object is written to the file
     this.fileOffset = 0; // keep track of where the next object will be written
 
@@ -224,15 +263,14 @@ export const writer = {
    * @returns {Promise}  resolves when the write is complete
    */
   finish () {
-    const catalog = Catalog({ Pages: this.pages, id: ++this.idCounter });
     const info = Info({ ..._pick(this, Info().keys), id: ++this.idCounter });
 
     return this.writeObject(this.pages)
     .then(() => this.writePage(this.page))
     .then(() => this.writeObject(this.content))
-    .then(() => this.writeObject(catalog))
+    .then(() => this.writeObject(this.catalog))
     .then(() => this.writeObject(info))
-    .then(() => this.writeXref({ catalog, info }));
+    .then(() => this.writeXref({ catalog: this.catalog, info }));
   }
 };
 
