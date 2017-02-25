@@ -51,9 +51,28 @@ Writer({
     .then(() => writer.placeImage({ handle: 'myJpg', x: 400, y: 560, width: 91.6, height: 32.2 }))
     .then(() => writer.addText({ x: 380, y: 500, font: 'F1', size: 12, text: 'JPEG' }))
 
+    // add a page anchor for this page
+    .then(() => writer.addPageAnchor({ name: 'Page 1 mid', top: 400 }))
+
+    // add a link to a page
+    .then(() => writer.addText({ x: 10, y: 360, font: 'F1', size: 16, text: 'Link to Page 2' }))
+    // internal links must begin with a hash and have a matching page anchor
+    .then(() => writer.addLink({ x: 10, y: 360, x2: 100, y2: 380, target: '#Page 2' }))
+
+    // add a link to position in a page
+    .then(() => writer.addText({ x: 10, y: 340, font: 'F1', size: 16, text: 'Link to Middle of Page 1' }))
+    .then(() => writer.addLink({ x: 10, y: 340, x2: 100, y2: 360, target: '#Page 1 mid' }))
+
+    // add an external link
+    .then(() => writer.addText({ x: 10, y: 400, font: 'F1', size: 16, text: 'Link to Web' }))
+    .then(() => writer.addLink({ x: 10, y: 400, x2: 100, y2: 420, target: 'https://docca.io' }))
+
     // add another page adding the font later
     .then(() => writer.addPage({ MediaBox: [0, 0, 595, 841] }))
     .then(() => writer.addResources({ Font: { F1: font } }))
+
+    // add a page anchor for this page
+    .then(() => writer.addPageAnchor({ name: 'Page 2' }))
 
     .then(() => writer.addText([
       { x: 10, y: 800, font: 'F1', size: 16, text: 'Hello Again!' },
